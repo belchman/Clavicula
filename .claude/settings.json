@@ -1,0 +1,111 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "Bash(git *)",
+      "Bash(npm test*)",
+      "Bash(npm run *)",
+      "Bash(npx *)",
+      "Bash(pytest*)",
+      "Bash(go test*)",
+      "Bash(go build*)",
+      "Bash(cargo test*)",
+      "Bash(cargo build*)",
+      "Bash(gh *)",
+      "Bash(jq *)",
+      "Bash(mkdir *)",
+      "Bash(chmod *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(diff *)",
+      "Bash(wc *)",
+      "Bash(timeout *)",
+      "Bash(sha256sum *)",
+      "Bash(shasum *)",
+      "Bash(scripts/*)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/conjuration/pre-session.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/binding/pre-tool-use.sh \"$TOOL_INPUT\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/binding/block-sensitive.sh \"$TOOL_INPUT\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/hga/evaluate-output.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/license-to-depart/stop-hook.sh"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/license-to-depart/subagent-stop-hook.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/conjuration/pre-compact.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

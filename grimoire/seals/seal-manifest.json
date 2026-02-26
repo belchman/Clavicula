@@ -1,0 +1,105 @@
+{
+  "version": "0.1.0",
+  "generated": "2026-02-26T00:00:00Z",
+  "seals": [
+    {
+      "name": "paimon",
+      "rank": "king",
+      "file": ".claude/agents/kings/orchestrator.md",
+      "sha256": "76df493f38d90827a61b038728703bcd11e01d5c835556031d7fc30c5df65de4",
+      "model": "opus",
+      "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"],
+      "allowed_mcp_servers": ["mem0"],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "astaroth",
+      "rank": "duke",
+      "file": ".claude/agents/dukes/coder.md",
+      "sha256": "82b8aa7e362dc8cbe16cda542d3b73c62b3164b2a7c30f11370d6f4da036749b",
+      "model": "opus",
+      "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "vassago",
+      "rank": "duke",
+      "file": ".claude/agents/dukes/researcher.md",
+      "sha256": "c95579bd4d594b221c387d8f6ee8d881a7ccadd06b330df0c04a219d375276ad",
+      "model": "opus",
+      "tools": ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"],
+      "allowed_mcp_servers": ["mem0"],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "agares",
+      "rank": "duke",
+      "file": ".claude/agents/dukes/writer.md",
+      "sha256": "4a6dd7fbfb3598f0f5f405e4aebc03ba34fa73f08153de79e47af597e8adb8c6",
+      "model": "opus",
+      "tools": ["Read", "Write", "Edit", "Grep", "Glob"],
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "marbas",
+      "rank": "president",
+      "file": ".claude/agents/presidents/reviewer.md",
+      "sha256": "32564902544c7ed0f3658b81e95b9a7c96184a50d39f9a9d4be9daa432c3fdc3",
+      "model": "opus",
+      "tools": ["Read", "Grep", "Glob"],
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "buer",
+      "rank": "president",
+      "file": ".claude/agents/presidents/planner.md",
+      "sha256": "2923f962c6cdc39e16ff3c7dc5faaaadbf60690d5987c17af57f9db4dc76c794",
+      "model": "opus",
+      "tools": ["Read", "Grep", "Glob"],
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "foras",
+      "rank": "earl",
+      "file": ".claude/agents/earls/guardian.md",
+      "sha256": "fdf975ab363093402fed3d07f230ea848bce6fddf26cef9bdf72bf25deeaf1c5",
+      "model": "opus",
+      "tools": ["Read", "Grep", "Glob"],
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "andromalius",
+      "rank": "earl",
+      "file": ".claude/agents/earls/auditor.md",
+      "sha256": "3f4d700f63ba73ce8f9dffe9be3ed5e8ccca120281481bf66f6869ee622193cd",
+      "model": "opus",
+      "tools": ["Read", "Grep", "Glob", "Bash"],
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    },
+    {
+      "name": "furcas",
+      "rank": "knight",
+      "file": ".claude/agents/knights/utility.md",
+      "sha256": "be47c3bfe3eb8d6d15b103fb9db0d0632e0a4f99cf157d5fa2ed53ab6860ad63",
+      "model": "opus",
+      "tools": ["Read", "Grep", "Glob"],
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
+    }
+  ]
+}

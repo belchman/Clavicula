@@ -1,0 +1,33 @@
+# Grimoire Protocol — Sensitive files
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Audit logs (contain session data)
+grimoire/logs/audit.log
+grimoire/logs/last-session-state.json
+grimoire/logs/banished-state.json
+
+# Pipeline kill switch
+.pipeline-kill
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build outputs
+dist/
+build/
+target/

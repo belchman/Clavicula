@@ -1,0 +1,68 @@
+# Grimoire Protocol Configuration
+# Single source of truth for all tunable values.
+#
+# ESSENTIAL:
+#   [grimoire] version, default_model
+#   [budget] max_session_cost
+#
+# TUNE FOR COST:
+#   [budget], [turns]
+#
+# TUNE FOR QUALITY:
+#   [quality] thresholds and retries
+
+[grimoire]
+version = "0.1.0"
+default_model = "opus"         # opus | sonnet — floor is sonnet 4.6
+
+[models.roles]
+orchestration = "opus"         # Kings
+implementation = "opus"        # Dukes (configurable down to sonnet)
+specification = "opus"         # Spec writing (The Way: opus writes specs)
+review = "opus"                # Presidents
+security = "opus"              # Earls
+utility = "opus"               # Knights (configurable down to sonnet)
+hga = "opus"                   # Holy Guardian Angel
+holdout_generate = "opus"      # Adversarial spec generation
+holdout_validate = "opus"      # Holdout evaluation
+
+[turns]
+quick = 15                     # phase0, verify, utility tasks
+medium = 30                    # reviews, holdout, write-specs, ship
+long = 50                      # interrogate, generate-docs, implement
+
+[budget]
+max_session_cost = 50.0
+low = 3.0
+medium = 5.0
+high = 10.0
+
+[quality]
+max_verify_retries = 3
+threshold_auto_pass = 0.95
+threshold_pass = 0.80
+threshold_iterate = 0.60
+threshold_holdout = 0.80
+
+[watchdog]
+inactivity_timeout = 120
+max_restarts = 2
+stagnation_similarity = 0.90
+
+[containment]
+require_worktree_for_kings = true
+block_credential_access = true
+block_self_modification = true
+block_network_for_knights = true
+audit_all_writes = true
+
+[templates]
+mode = "auto"                  # auto | minimal | full
+
+[paths]
+log_dir = "grimoire/logs"
+artifacts_dir = "docs/artifacts"
+summaries_dir = "docs/summaries"
+templates_dir = "grimoire/templates"
+seals_dir = "grimoire/seals"
+bindings_dir = "grimoire/bindings"

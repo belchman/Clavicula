@@ -2,96 +2,70 @@
   "version": "0.1.0",
   "generated": "2026-02-26T00:00:00Z",
   "model_selection": "dynamic — determined at invocation time based on grimoire.toml default_model.",
+  "integrity": "See checksums.sha256 for agent definition integrity verification.",
   "seals": [
     {
       "name": "paimon",
       "rank": "king",
       "file": ".claude/agents/kings/orchestrator.md",
-      "sha256": "f34b8c07fda6ef7b633dd0e795bc929b2ef1a799affee2f91d5ca3a08c8f1d9e",
       "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"],
-      "allowed_mcp_servers": ["mem0"],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": ["mem0"]
     },
     {
       "name": "astaroth",
       "rank": "duke",
       "file": ".claude/agents/dukes/coder.md",
-      "sha256": "f0d303ddd802003bc77d80ae39c1f0d8d142bebf716fa5abc4ba364d839f0755",
       "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "allowed_mcp_servers": [],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": []
     },
     {
       "name": "vassago",
       "rank": "duke",
       "file": ".claude/agents/dukes/researcher.md",
-      "sha256": "3afa250cdf9be12da7229d06b9d4e8165a800124e90cac06ddb497f3ffa68fac",
       "tools": ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"],
-      "allowed_mcp_servers": ["mem0"],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": ["mem0"]
     },
     {
       "name": "agares",
       "rank": "duke",
       "file": ".claude/agents/dukes/writer.md",
-      "sha256": "4db8b1479026061ccb0b9b427d14ab13a41d2e8df2225ff055cfaeee489c8af4",
       "tools": ["Read", "Write", "Edit", "Grep", "Glob"],
-      "allowed_mcp_servers": [],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": []
     },
     {
       "name": "marbas",
       "rank": "president",
       "file": ".claude/agents/presidents/reviewer.md",
-      "sha256": "68f3634bc40027b2b4b1bc531cd2491ffa3aa2d8ab0fedebc8c847eec99d78da",
       "tools": ["Read", "Grep", "Glob"],
-      "allowed_mcp_servers": [],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": []
     },
     {
       "name": "buer",
       "rank": "president",
       "file": ".claude/agents/presidents/planner.md",
-      "sha256": "eb93e2976acc4aaa84beb434c2d3af1dd3895d24b23e3d2bf3ba5990529a931f",
       "tools": ["Read", "Grep", "Glob"],
-      "allowed_mcp_servers": [],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": []
     },
     {
       "name": "foras",
       "rank": "earl",
       "file": ".claude/agents/earls/guardian.md",
-      "sha256": "4ce0a8e1780b097cb0038d15ce33196ec6413c6b022e88dcaa52f098acb3b918",
       "tools": ["Read", "Grep", "Glob"],
-      "allowed_mcp_servers": [],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": []
     },
     {
       "name": "andromalius",
       "rank": "earl",
       "file": ".claude/agents/earls/auditor.md",
-      "sha256": "6b6abd0e5104901ade9adddc23761c56f25131a25088310093b0ed822b108592",
       "tools": ["Read", "Grep", "Glob", "Bash"],
-      "allowed_mcp_servers": [],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": []
     },
     {
       "name": "furcas",
       "rank": "knight",
       "file": ".claude/agents/knights/utility.md",
-      "sha256": "0f6119ef92a38880aabe995edd2cb7066037b69bc99d69e0391c3d01a8b3e75b",
       "tools": ["Read", "Grep", "Glob"],
-      "allowed_mcp_servers": [],
-      "created": "2026-02-26T00:00:00Z",
-      "modified": "2026-02-26T00:00:00Z"
+      "allowed_mcp_servers": []
     }
   ]
 }

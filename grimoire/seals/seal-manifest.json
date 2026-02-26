@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
   "generated": "2026-02-26T00:00:00Z",
-  "model_selection": "dynamic — determined at invocation time. See grimoire.toml [models.roles] for defaults.",
+  "model_selection": "dynamic — determined at invocation time based on grimoire.toml default_model.",
   "seals": [
     {
       "name": "paimon",
@@ -37,7 +37,7 @@
       "name": "agares",
       "rank": "duke",
       "file": ".claude/agents/dukes/writer.md",
-      "sha256": "92ed917a210d3f3ab5fde714b1c3f732fe4a69804f60e7bc7da8d14253c962a7",
+      "sha256": "4db8b1479026061ccb0b9b427d14ab13a41d2e8df2225ff055cfaeee489c8af4",
       "tools": ["Read", "Write", "Edit", "Grep", "Glob"],
       "allowed_mcp_servers": [],
       "created": "2026-02-26T00:00:00Z",

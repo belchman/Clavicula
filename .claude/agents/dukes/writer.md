@@ -30,7 +30,6 @@ You may NOT:
 ## Documentation Standards
 
 - Use templates from `grimoire/templates/` as starting points
-- Follow adaptive template selection from grimoire.toml [templates] mode
 - Include cross-references between documents (Related Documents sections)
 - Tag all assumptions with [ASSUMPTION: rationale] and confidence level
 - Write acceptance criteria in Given/When/Then form

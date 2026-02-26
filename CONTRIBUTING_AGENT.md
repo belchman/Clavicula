@@ -162,14 +162,14 @@ When asked to build or change behavior, follow this sequence. It is not optional
 
 1. **Phase 0: Context Scan.** Scan git state, project type, PM tool, TODOs, test status, blockers, Grimoire integrity. Write summary to `docs/summaries/`.
 2. **Interrogate.** Execute all 13 sections of the interrogation protocol. Search MCP sources first, infer second, assume last. Tag every assumption. Capture intent as user stories: _As a \<role\>, I want \<capability\>, so that \<benefit\>._
-3. **Review the interrogation.** LLM-as-Judge with position bias mitigation (dual-pass). Score each section. Gate: `>= threshold_pass` (from grimoire.toml) to proceed.
+3. **Review the interrogation.** LLM-as-Judge with position bias mitigation (dual-pass). Score each section. Must pass to proceed.
 4. **Generate documentation.** Fill all applicable templates from `grimoire/templates/`. One at a time. Write output, release from context. Every feature in the PRD must have acceptance criteria in Given/When/Then form.
-5. **Review the documentation.** LLM-as-Judge again. Gate: `>= threshold_pass` to proceed.
+5. **Review the documentation.** LLM-as-Judge again. Must pass to proceed.
 6. **Write executable specifications.** Translate acceptance criteria into the project's test framework (Gherkin features, test cases, or equivalent). Run them and confirm they fail. This is the red phase.
 7. **Generate holdout scenarios.** Adversarial tests written in complete isolation from the implementation agent. Written to holdout directory. These are the hidden specifications.
-8. **Implement.** Step by step from `IMPLEMENTATION_PLAN.md`. Write only the code required to make the specifications pass. This is the green phase. Verify each step. Retry up to `max_verify_retries` (from grimoire.toml). Commit after each verified step.
+8. **Implement.** Step by step from `IMPLEMENTATION_PLAN.md`. Write only the code required to make the specifications pass. This is the green phase. Verify each step. Retry up to 3 times. Commit after each verified step.
 9. **Refactor.** Only while all specifications remain green.
-10. **Holdout validation.** Run implementation against the hidden scenarios. Gate: `>= threshold_holdout` and zero anti-pattern flags.
+10. **Holdout validation.** Run implementation against the hidden scenarios. Gate: must pass with zero anti-pattern flags.
 11. **Security audit.** Scan for OWASP top 10, hardcoded secrets, insecure defaults. Gate: zero BLOCKERs.
 12. **Ship.** Final test suite, PR creation, recording.
 
@@ -199,10 +199,10 @@ Gates are the checkpoints of The Way. They are not optional.
 | Gate | Threshold | Failure Action |
 |------|-----------|----------------|
 | Epic Readiness | PR-FAQ + Stories + Gherkin | BLOCK until satisfied |
-| Interrogation review | `threshold_pass` | ITERATE or BLOCK |
-| Doc review | `threshold_pass` | ITERATE |
-| Verify | PASS/FAIL | Retry up to `max_verify_retries`, then BLOCK |
-| Holdout validation | `threshold_holdout` + zero anti-patterns | Route back to implement |
+| Interrogation review | LLM-as-Judge pass | ITERATE or BLOCK |
+| Doc review | LLM-as-Judge pass | ITERATE |
+| Verify | PASS/FAIL | Retry up to 3 times, then BLOCK |
+| Holdout validation | Pass + zero anti-patterns | Route back to implement |
 | Security audit | Zero BLOCKERs | Auto-fix, then re-audit |
 | Ship | All green | Create PR |
 
@@ -210,18 +210,13 @@ All review gates use LLM-as-Judge with position bias mitigation:
 - Dual-pass evaluation (normal order + reversed order)
 - Stricter verdict wins when passes disagree
 
-Satisfaction scoring uses grimoire.toml thresholds, not magic numbers.
-
 ## Circuit Breakers
 
 The pipeline protects itself from runaway cost and infinite loops.
 
 - **Kill switch:** Create `.pipeline-kill` to halt immediately.
-- **Cost ceiling:** `max_session_cost` (grimoire.toml) stops the pipeline if exceeded.
-- **Per-phase limits:** `[turns]` and `[budget]` sections in grimoire.toml.
-- **Stagnation detection:** `>= stagnation_similarity` similar errors across retries triggers reroute.
-
-Circuit breakers are not paranoia. They are discipline.
+- **Per-phase turn limits:** `[turns]` section in grimoire.toml.
+- **Stagnation detection:** similar errors across retries triggers reroute.
 
 ## Auto-Detection
 

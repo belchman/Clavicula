@@ -681,8 +681,8 @@ Planetary hours assign optimal times for different types of magical operations. 
 
 In the implementation, agent definitions do NOT hardcode a `model:` field. Instead, model selection is dynamic:
 
-1. `grimoire.toml` `[models.roles]` provides **advisory defaults** per rank (e.g., `orchestration = "opus"`, `utility = "opus"`)
-2. At invocation time, the invoker (human or King-rank orchestrator) can override the default based on task complexity, cost/latency trade-offs, or explicit instruction
+1. `grimoire.toml` `default_model` sets the baseline (currently `opus`)
+2. At invocation time, the invoker (human or King-rank orchestrator) can override based on task complexity or cost/latency trade-offs
 3. Claude Code's `model` parameter on the Task tool determines the actual model used
 
 This allows a Duke agent to run on sonnet for simple tasks or opus for complex ones, without changing the agent definition file.
@@ -957,7 +957,7 @@ This section documents all divergences between the original spec (February 25, 2
 
 | Spec | Implementation | Why |
 |------|---------------|-----|
-| Differentiated by rank: King=Opus, Duke=Sonnet, President=Opus/o3, Earl=Opus, Knight=Haiku | No `model:` field in agent definitions; dynamic selection at invocation time | Agent definitions should be model-agnostic. The invoker (human or King-rank orchestrator) determines model based on task complexity, cost/latency trade-offs, and `grimoire.toml` `[models.roles]` advisory defaults. This allows the same agent to run on opus for complex tasks or sonnet for simple ones without modifying the agent definition file. |
+| Differentiated by rank: King=Opus, Duke=Sonnet, President=Opus/o3, Earl=Opus, Knight=Haiku | No `model:` field in agent definitions; dynamic selection at invocation time | Agent definitions should be model-agnostic. The invoker (human or King-rank orchestrator) determines model based on task complexity, cost/latency trade-offs, and `grimoire.toml` `default_model`. This allows the same agent to run on opus for complex tasks or sonnet for simple ones without modifying the agent definition file. |
 | `model` field in seal-manifest.json per seal | `model_selection` top-level field + no per-seal model | Consistent with dynamic model selection. grimoire.toml provides the defaults. |
 
 ### Holy Guardian Angel (HGA)

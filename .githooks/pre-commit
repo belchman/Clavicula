@@ -1,0 +1,72 @@
+#!/bin/bash
+# Grimoire Protocol — Git Pre-Commit Hook
+# Enforces The Way's Epic Readiness Gate before commits are accepted.
+#
+# Install: git config core.hooksPath .githooks
+
+set -euo pipefail
+
+GRIMOIRE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# ─── Epic Readiness Gate ──────────────────────────────────────────────────────
+# Validates that Epics being moved to "Ready" comply with The Way:
+#   - Must include a PR-FAQ document
+#   - Must include at least one Story
+#   - All Stories must include valid Gherkin specification code
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
+
+# Only run the gate if PM tool files are staged
+if echo "$STAGED_FILES" | grep -qE '\.beads/|project/issues/'; then
+  if command -v python3 &> /dev/null; then
+    python3 "$GRIMOIRE_ROOT/scripts/epic-readiness-gate.py"
+    if [ $? -ne 0 ]; then
+      exit 1
+    fi
+  else
+    echo "WARNING: python3 not found — skipping Epic Readiness Gate validation"
+  fi
+fi
+
+# ─── Credential Leak Check ───────────────────────────────────────────────────
+# Check staged files for accidental credential exposure
+
+SECRETS_FOUND=0
+for file in $STAGED_FILES; do
+  # Skip binary files and certain paths
+  if echo "$file" | grep -qE '\.(png|jpg|gif|ico|woff|ttf|eot|svg|pdf)$'; then
+    continue
+  fi
+
+  CONTENT=$(git show ":$file" 2>/dev/null || true)
+  if [ -z "$CONTENT" ]; then
+    continue
+  fi
+
+  # Check for common secret patterns
+  if echo "$CONTENT" | grep -qE 'AKIA[A-Z0-9]{16}'; then
+    echo "BLOCKED: Potential AWS access key found in $file"
+    SECRETS_FOUND=1
+  fi
+  if echo "$CONTENT" | grep -qE 'ghp_[a-zA-Z0-9]{36}'; then
+    echo "BLOCKED: Potential GitHub token found in $file"
+    SECRETS_FOUND=1
+  fi
+  if echo "$CONTENT" | grep -qE 'sk-[a-zA-Z0-9]{48}'; then
+    echo "BLOCKED: Potential API secret key found in $file"
+    SECRETS_FOUND=1
+  fi
+  if echo "$CONTENT" | grep -qE '\-\-\-\-\-BEGIN.*PRIVATE KEY'; then
+    echo "BLOCKED: Private key found in $file"
+    SECRETS_FOUND=1
+  fi
+done
+
+if [ "$SECRETS_FOUND" -eq 1 ]; then
+  echo ""
+  echo "Commit blocked: credentials detected in staged files."
+  echo "Remove secrets before committing. See grimoire/bindings/divine-names.md, Name #2."
+  exit 1
+fi
+
+exit 0

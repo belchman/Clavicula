@@ -70,6 +70,15 @@ Enforcement layers: tool restrictions (agent definitions) + hooks (pre-tool-use)
 
 ---
 
+## MCP Servers
+
+See `.mcp.json` for configured external tools. All MCP servers require explicit
+user approval before first execution per CVE-2025-59536 remediation.
+
+Currently configured: Mem0 (persistent memory).
+
+---
+
 ## Configuration
 
 - **Tunable values**: `grimoire.toml` — single source of truth for thresholds, budgets, models

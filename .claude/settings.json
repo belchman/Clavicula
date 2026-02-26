@@ -44,14 +44,6 @@
             "command": "bash .claude/hooks/conjuration/pre-session.sh"
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "command -v bd >/dev/null 2>&1 && bd prime || true"
-          }
-        ]
       }
     ],
     "PreToolUse": [

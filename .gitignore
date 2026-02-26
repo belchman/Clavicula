@@ -6,6 +6,9 @@
 *.p12
 *.pfx
 
+# Claude Code local settings (user-specific MCP approvals)
+.claude/settings.local.json
+
 # Audit logs (contain session data)
 grimoire/logs/audit.log
 grimoire/logs/last-session-state.json

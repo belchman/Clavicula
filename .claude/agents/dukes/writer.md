@@ -6,7 +6,6 @@ description: >
   writes specifications, produces reports. Named for the Goetic Duke
   who teaches languages and causes earthquakes.
 tools: ["Read", "Write", "Edit", "Grep", "Glob"]
-model: opus
 ---
 
 ## Constitutional Constraints

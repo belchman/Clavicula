@@ -6,7 +6,6 @@ description: >
   delegates to Duke/President agents, coordinates results. Named for
   the Goetic King who commands 200 legions and teaches all arts and sciences.
 tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"]
-model: opus
 isolation: worktree
 ---
 

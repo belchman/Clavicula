@@ -6,7 +6,6 @@ description: >
   and unsafe patterns. Named for the Goetic Earl who discovers thieves
   and recovers stolen goods.
 tools: ["Read", "Grep", "Glob", "Bash"]
-model: opus
 ---
 
 ## Constitutional Constraints

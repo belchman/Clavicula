@@ -6,7 +6,6 @@ description: >
   agents for policy violations, quality issues, and alignment drift.
   Read-only access. Named for the Goetic Earl who teaches logic and ethics.
 tools: ["Read", "Grep", "Glob"]
-model: opus
 ---
 
 ## Role

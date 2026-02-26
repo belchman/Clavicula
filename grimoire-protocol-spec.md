@@ -2,9 +2,9 @@
 
 ## For Claude Code
 
-**Version:** 0.1.0-draft
-**Date:** February 25, 2026
-**Status:** Specification (pre-implementation)
+**Version:** 0.1.0
+**Date:** February 25, 2026 (spec) / February 26, 2026 (implementation)
+**Status:** Implemented — see [Section 22](#22-implementation-divergences) for divergences from original spec
 
 ---
 
@@ -31,6 +31,7 @@
 19. [Cost Estimates](#19-cost-estimates)
 20. [Known Limitations and Open Questions](#20-known-limitations-and-open-questions)
 21. [References](#21-references)
+22. [Implementation Divergences](#22-implementation-divergences)
 
 ---
 
@@ -167,6 +168,8 @@ The core insight: the grimoire tradition assumes the entity you summon is powerf
 ```
 project-root/
 ├── CLAUDE.md                          # THE GRIMOIRE — master rules document
+├── CONTRIBUTING_AGENT.md              # THE WAY — outside-in BDD discipline
+├── grimoire.toml                      # Single source of tunable values
 ├── .claude/
 │   ├── settings.json                  # Claude Code settings (hooks, permissions)
 │   ├── agents/                        # GOETIC HIERARCHY — agent definitions
@@ -180,31 +183,42 @@ project-root/
 │   │   │   ├── reviewer.md            # President-rank: code review + verification
 │   │   │   └── planner.md             # President-rank: planning + architecture
 │   │   ├── earls/
-│   │   │   ├── guardian.md            # Earl-rank: security enforcement
-│   │   │   └── auditor.md            # Earl-rank: compliance + audit
+│   │   │   ├── guardian.md            # Earl-rank: HGA alignment monitor
+│   │   │   └── auditor.md            # Earl-rank: security + compliance
 │   │   └── knights/
-│   │       └── utility.md             # Knight-rank: file ops, cleanup, formatting
+│   │       └── utility.md             # Knight-rank: file ops, search, formatting
 │   ├── hooks/
 │   │   ├── conjuration/
 │   │   │   ├── pre-session.sh         # CONJURATION — session initialization
-│   │   │   ├── post-session.sh        # LICENSE TO DEPART — session cleanup
 │   │   │   └── pre-compact.sh         # State preservation before compaction
 │   │   ├── binding/
-│   │   │   ├── pre-tool-use.sh        # BINDING — tool call validation
-│   │   │   ├── post-tool-use.sh       # BINDING — output validation
-│   │   │   └── block-sensitive.sh     # Block credential/secret operations
+│   │   │   ├── pre-tool-use.sh        # BINDING — tool call validation (Bash)
+│   │   │   ├── block-sensitive.sh     # BINDING — credential blocking (Write|Edit)
+│   │   │   └── config-change-alert.sh # BINDING — tamper detection (ConfigChange)
 │   │   ├── hga/
-│   │   │   ├── evaluate-output.sh     # HGA — alignment check on agent output
-│   │   │   └── log-to-langfuse.sh     # HGA — send traces to monitoring
+│   │   │   └── evaluate-output.sh     # HGA — output validation (PostToolUse)
 │   │   └── license-to-depart/
-│   │       ├── stop-hook.sh           # Cleanup on agent stop
+│   │       ├── stop-hook.sh           # Cleanup on session stop
 │   │       └── subagent-stop-hook.sh  # Cleanup on subagent stop
+│   ├── skills/                        # THE WAY — phase skills
+│   │   ├── phase0/SKILL.md            # Context scan
+│   │   ├── interrogate/SKILL.md       # 13-section interrogation
+│   │   ├── feature-add/SKILL.md       # Lightweight feature addition
+│   │   ├── cost-report/SKILL.md       # Pipeline cost analysis
+│   │   ├── error-analysis/SKILL.md    # Error pattern clustering
+│   │   ├── heal/SKILL.md              # Self-healing cycle
+│   │   └── update-progress/SKILL.md   # Progress tracking
+│   ├── rules/                         # Behavioral rules
+│   │   ├── no-assumptions.md          # Never guess — ask or search
+│   │   └── context-management.md      # 40-60% context window discipline
 │   └── commands/
 │       ├── conjure.md                 # /conjure — invoke agent with full protocol
 │       ├── banish.md                  # /banish — force-terminate agent
 │       ├── scry.md                    # /scry — inspect agent state + memory
 │       └── ward.md                    # /ward — run red-team checks
 ├── .mcp.json                          # MCP server configurations (project-scoped)
+├── .githooks/
+│   └── pre-commit                     # Git pre-commit hook (secrets, lint)
 ├── grimoire/
 │   ├── seals/                         # SEALS — agent identity documents
 │   │   ├── seal-manifest.json         # Registry of all agent seals
@@ -218,17 +232,32 @@ project-root/
 │   │       └── external-comms.md
 │   ├── correspondences/               # PLANETARY HOURS — routing rules
 │   │   └── routing-table.json         # Task-type → model mapping
+│   ├── templates/                     # Document templates (from Anvil)
+│   │   ├── PRD.md
+│   │   ├── APP_FLOW.md
+│   │   ├── TECH_STACK.md
+│   │   ├── DATA_MODELS.md
+│   │   ├── API_SPEC.md
+│   │   ├── FRONTEND_GUIDELINES.md
+│   │   ├── IMPLEMENTATION_PLAN.md
+│   │   ├── TESTING_PLAN.md
+│   │   ├── SECURITY_CHECKLIST.md
+│   │   ├── OBSERVABILITY.md
+│   │   └── ROLLOUT_PLAN.md
 │   ├── wards/                         # ADVERSARY — red-team configs
 │   │   ├── promptfoo.yaml             # Promptfoo test configurations
 │   │   └── attack-scenarios/          # Custom attack patterns
 │   └── logs/                          # AUDIT TRAIL — session records
 │       └── .gitkeep
-└── scripts/
-    ├── draw-circle.sh                 # Container setup for Triangle of Art
-    ├── verify-seals.sh                # Integrity check on agent definitions
-    ├── planetary-router.py            # Model routing logic
-    └── hga-evaluate.py                # HGA evaluation script
+├── scripts/
+│   ├── draw-circle.sh                 # Container setup for Triangle of Art
+│   └── verify-seals.sh                # Integrity check on agent definitions
+└── docs/
+    ├── summaries/                     # Phase summaries (pyramid format)
+    └── artifacts/                     # Full phase outputs
 ```
+
+> **Implementation note:** The spec originally listed `planetary-router.py` and `hga-evaluate.py` under `scripts/`. These were deferred — model routing is handled by `grimoire.toml` + dynamic selection at invocation time, and HGA evaluation uses the `guardian.md` Earl agent directly. See [Section 22](#22-implementation-divergences).
 
 ---
 
@@ -335,11 +364,14 @@ Subagent definitions restrict which tools each agent can access:
 name: code-reviewer
 description: Reviews code for quality, security, and maintainability
 tools: ["Read", "Grep", "Glob"]
-model: sonnet
 ---
 ```
 
-Available tools to restrict: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`, `LS`, `GrepTool`, `GlobTool`, `Replace`, `MultiEdit`.
+> **Implementation note (model):** The spec originally showed `model: sonnet` in this example. In implementation, agent definitions do not hardcode a `model:` field — model is determined dynamically at invocation time. See [Section 22](#22-implementation-divergences).
+
+Available tools to restrict: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`.
+
+> **Implementation note (tools):** The spec originally listed legacy tool names (`LS`, `GrepTool`, `GlobTool`, `Replace`, `MultiEdit`). These have been consolidated in current Claude Code to: `Read` (was LS), `Glob` (was GlobTool), `Grep` (was GrepTool), `Edit` (was Replace/MultiEdit), `Write`. All agent definitions use current names only.
 
 A President-rank agent with `tools: ["Read", "Grep", "Glob"]` physically cannot write files or execute commands. This is enforced by Claude Code, not by the agent's willingness to comply.
 
@@ -511,11 +543,11 @@ exit 0
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|Replace",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/binding/post-tool-use.sh"
+            "command": "bash .claude/hooks/hga/evaluate-output.sh"
           }
         ]
       }
@@ -523,6 +555,8 @@ exit 0
   }
 }
 ```
+
+> **Implementation note:** The matcher uses `"Write|Edit"` (current tool names) instead of the original `"Write|Edit|MultiEdit|Replace"` (which included legacy names). The hook script was renamed from `post-tool-use.sh` to `evaluate-output.sh` and moved under `hga/` to clarify its role as HGA output validation.
 
 The post-tool-use hook inspects outputs after execution. It can:
 - Check for accidentally included secrets in written files
@@ -561,11 +595,14 @@ description: >
   Primary orchestrator. Manages multi-step workflows, delegates to Duke and
   President agents, coordinates parallel execution. Named for the Goetic King
   who commands 200 legions and teaches all arts and sciences.
-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "LS", "GlobTool", "GrepTool", "Replace", "MultiEdit"]
-model: opus
+tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"]
 isolation: worktree
-allowed_mcp_servers: ["github", "mem0", "langfuse"]
+allowed_mcp_servers: ["mem0"]
 ---
+
+> **Implementation note (tools):** The spec originally listed legacy tool names. Current Claude Code uses: Read, Write, Edit, Bash, Grep, Glob, Task, WebSearch, WebFetch. See [Section 22](#22-implementation-divergences).
+>
+> **Implementation note (model):** Agent definitions no longer hardcode a `model:` field. Model is determined dynamically at invocation time based on task complexity, `grimoire.toml` defaults, and cost/latency trade-offs. See [Section 22](#22-implementation-divergences).
 
 ## Constitutional Constraints
 
@@ -601,33 +638,34 @@ You are bound by the Divine Names in CLAUDE.md. Read it before every operation.
 ```json
 {
   "version": "0.1.0",
-  "generated": "2026-02-25T00:00:00Z",
+  "generated": "2026-02-26T00:00:00Z",
+  "model_selection": "dynamic — determined at invocation time. See grimoire.toml [models.roles] for defaults.",
   "seals": [
     {
       "name": "paimon",
       "rank": "king",
       "file": ".claude/agents/kings/orchestrator.md",
-      "sha256": "a1b2c3d4e5f6...",
-      "model": "opus",
-      "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "LS", "GlobTool", "GrepTool", "Replace", "MultiEdit"],
-      "allowed_mcp_servers": ["github", "mem0", "langfuse"],
-      "created": "2026-02-25T00:00:00Z",
-      "modified": "2026-02-25T00:00:00Z"
+      "sha256": "f34b8c07...",
+      "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"],
+      "allowed_mcp_servers": ["mem0"],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
     },
     {
       "name": "astaroth",
       "rank": "duke",
       "file": ".claude/agents/dukes/coder.md",
-      "sha256": "b2c3d4e5f6a1...",
-      "model": "sonnet",
+      "sha256": "f0d303dd...",
       "tools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "allowed_mcp_servers": ["github"],
-      "created": "2026-02-25T00:00:00Z",
-      "modified": "2026-02-25T00:00:00Z"
+      "allowed_mcp_servers": [],
+      "created": "2026-02-26T00:00:00Z",
+      "modified": "2026-02-26T00:00:00Z"
     }
   ]
 }
 ```
+
+> **Implementation note:** The `model` field has been removed from individual seal entries. Model selection is now dynamic — determined at invocation time by the invoker (human or King-rank orchestrator) based on task complexity, `grimoire.toml` `[models.roles]` defaults, and cost/latency trade-offs. The `model_selection` top-level field documents this policy.
 
 #### Seal verification script
 
@@ -701,7 +739,7 @@ The grimoire prescribes a strict sequence for summoning: preparation → invocat
         ]
       },
       {
-        "matcher": "Write|Edit|MultiEdit|Replace",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
@@ -712,7 +750,7 @@ The grimoire prescribes a strict sequence for summoning: preparation → invocat
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit|Replace",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
@@ -764,6 +802,8 @@ The grimoire prescribes a strict sequence for summoning: preparation → invocat
   }
 }
 ```
+
+> **Implementation note (hooks):** The implementation differs from the original spec in several ways: (1) `post-session.sh` was replaced by `Stop` and `SubagentStop` hooks — Claude Code fires these events natively, making a separate post-session hook unnecessary. (2) `post-tool-use.sh` was split into `evaluate-output.sh` (HGA, PostToolUse) and `block-sensitive.sh` (credential blocking, PreToolUse on Write|Edit). (3) The PreToolUse and PostToolUse matchers use `"Write|Edit"` instead of `"Write|Edit|MultiEdit|Replace"` because MultiEdit and Replace are legacy tool names no longer used. (4) `log-to-langfuse.sh` was deferred (Langfuse integration not yet configured). (5) `config-change-alert.sh` was added under `binding/` for ConfigChange tamper detection. See [Section 22](#22-implementation-divergences).
 
 #### Lifecycle stages
 
@@ -909,7 +949,7 @@ Hooks are the binding mechanism. They enforce constraints at the infrastructure 
 ```bash
 #!/bin/bash
 # Enforce Divine Names constraint: no credential access
-# This hook fires on Write/Edit/MultiEdit/Replace
+# This hook fires on Write/Edit (current tool names; spec originally listed MultiEdit/Replace which are legacy)
 
 TOOL_INPUT="$1"
 
@@ -1079,14 +1119,13 @@ Define an Earl-rank agent specifically for evaluation:
 `.claude/agents/earls/guardian.md`:
 ```markdown
 ---
-name: guardian-angel
+name: foras
 rank: earl
 description: >
-  Alignment monitor. Evaluates outputs of King-rank agents for policy
-  violations, quality issues, and alignment drift. READ-ONLY access.
-  Cannot modify files. Reports findings to human operator.
+  Holy Guardian Angel — alignment monitor. Evaluates outputs of King-rank
+  agents for policy violations, quality issues, and alignment drift.
+  Read-only access.
 tools: ["Read", "Grep", "Glob"]
-model: opus
 ---
 
 ## Role
@@ -1304,21 +1343,13 @@ router_settings:
 
 #### Agent-level routing
 
-Each agent definition specifies its model. The `model` field in the agent definition frontmatter determines which model runs that agent:
-
-```markdown
----
-name: paimon
-model: opus           # Routes to Claude Opus 4.6
----
-```
-
-```markdown
----
-name: utility-spirit
-model: haiku           # Routes to Claude Haiku 4.5
----
-```
+> **Implementation note:** In the implementation, agent definitions do NOT hardcode a `model:` field. Instead, model selection is dynamic:
+>
+> 1. `grimoire.toml` `[models.roles]` provides **advisory defaults** per rank (e.g., `orchestration = "opus"`, `utility = "opus"`)
+> 2. At invocation time, the invoker (human or King-rank orchestrator) can override the default based on task complexity, cost/latency trade-offs, or explicit instruction
+> 3. Claude Code's `model` parameter on the Task tool determines the actual model used
+>
+> This replaces the original spec's approach of hardcoding `model: opus` or `model: haiku` in agent frontmatter. The benefit is flexibility — a Duke agent can run on sonnet for simple tasks or opus for complex ones, without changing the agent definition file. LiteLLM/OpenRouter remain the path for cross-provider routing (e.g., HGA on a different provider) but are deferred until needed.
 
 For cross-provider routing (e.g., using GPT-4o for the HGA while primary agents use Claude), the LiteLLM gateway handles model name translation.
 
@@ -1354,13 +1385,15 @@ The Ars Goetia's 72 spirits organized into 7 ranks provide a taxonomy for a mult
 
 #### Rank definitions
 
-| Rank | Count | Role | Tools | Model Tier | Can Spawn Subagents |
-|------|-------|------|-------|------------|-------------------|
-| King | 1-2 | Orchestration, planning, multi-step workflows | All | Opus | Yes |
-| Duke | 3-5 | Domain specialists (code, research, writing) | Domain-scoped | Sonnet | No (request via King) |
-| President | 2-3 | Review, verification, analysis | Read-only | Opus or o3 | No |
-| Earl | 1-2 | Security enforcement, compliance | Read + block hooks | Opus | No |
-| Knight | 1-2 | Utility (formatting, search, file ops) | Minimal | Haiku | No |
+| Rank | Count | Role | Tools | Model | Can Spawn Subagents |
+|------|-------|------|-------|-------|-------------------|
+| King | 1-2 | Orchestration, planning, multi-step workflows | All | Determined at invocation | Yes |
+| Duke | 3-5 | Domain specialists (code, research, writing) | Domain-scoped | Determined at invocation | No (request via King) |
+| President | 2-3 | Review, verification, analysis | Read-only | Determined at invocation | No |
+| Earl | 1-2 | Security enforcement, compliance | Read + block hooks | Determined at invocation | No |
+| Knight | 1-2 | Utility (formatting, search, file ops) | Minimal | Determined at invocation | No |
+
+> **Implementation note:** The spec originally assigned fixed model tiers by rank (King=Opus, Duke=Sonnet, Knight=Haiku). In implementation, all ranks default to opus (configurable via `grimoire.toml` `[models.roles]`), and model is determined dynamically at invocation time. Agent definition files do not contain a `model:` field. This allows the invoker to choose the appropriate model based on task complexity and cost constraints without modifying agent definitions.
 
 #### Example agent definitions
 
@@ -1374,8 +1407,7 @@ rank: king
 description: >
   Primary orchestrator. Decomposes complex tasks into subtasks,
   delegates to Duke/President agents, coordinates results.
-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "LS", "GlobTool", "GrepTool", "Replace", "MultiEdit"]
-model: opus
+tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch", "WebFetch"]
 isolation: worktree
 ---
 
@@ -1418,8 +1450,7 @@ rank: duke
 description: >
   Code implementation specialist. Writes, edits, and tests code.
   Follows project conventions and constraint documents.
-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "GlobTool", "GrepTool"]
-model: sonnet
+tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 ---
 
 ## Authority
@@ -1452,8 +1483,7 @@ rank: president
 description: >
   Code review and verification specialist. Read-only access.
   Identifies bugs, security issues, quality problems.
-tools: ["Read", "Grep", "Glob", "GlobTool", "GrepTool"]
-model: opus
+tools: ["Read", "Grep", "Glob"]
 ---
 
 ## Authority
@@ -1489,10 +1519,10 @@ Provide findings as: PASS / WARN / FAIL with file:line references.
 name: foras
 rank: earl
 description: >
-  Security and compliance enforcement. Can read any file and
-  block operations via findings. Cannot write application code.
-tools: ["Read", "Grep", "Glob", "Bash", "GlobTool", "GrepTool"]
-model: opus
+  Holy Guardian Angel — alignment monitor. Evaluates outputs of King-rank
+  agents for policy violations, quality issues, and alignment drift.
+  Read-only access.
+tools: ["Read", "Grep", "Glob"]
 ---
 
 ## Authority
@@ -1527,8 +1557,7 @@ rank: knight
 description: >
   Utility operations. File listing, search, formatting, cleanup.
   Minimal permissions. Cannot execute arbitrary commands.
-tools: ["Read", "Grep", "Glob", "LS", "GlobTool", "GrepTool"]
-model: haiku
+tools: ["Read", "Grep", "Glob"]
 ---
 
 ## Authority
@@ -1860,3 +1889,76 @@ API costs depend on usage. Rough estimates: light usage ~$50/month, moderate ~$2
 ---
 
 *The framework is buildable today. The occult metaphor is not decorative — it encodes structural requirements that the AI agent industry is converging on independently. Draw the circle first.*
+
+---
+
+## 22. Implementation Divergences
+
+This section documents all divergences between the original spec (February 25, 2026) and the implementation (February 26, 2026), with rationale for each change.
+
+### Tool Names
+
+| Spec (legacy) | Implementation (current) | Why |
+|---------------|-------------------------|-----|
+| `LS` | `Read` | Claude Code consolidated `LS` into `Read`. The Read tool can read files and directories. |
+| `GlobTool` | `Glob` | Renamed in Claude Code to shorter, consistent names. |
+| `GrepTool` | `Grep` | Renamed in Claude Code to shorter, consistent names. |
+| `Replace` | `Edit` | Claude Code unified Replace into Edit (exact string replacement). |
+| `MultiEdit` | `Edit` | Claude Code unified MultiEdit into Edit (single tool handles all edits). |
+| `Write\|Edit\|MultiEdit\|Replace` (hook matchers) | `Write\|Edit` | Hook matchers updated to use current tool names only. |
+
+### Model Assignment
+
+| Spec | Implementation | Why |
+|------|---------------|-----|
+| Differentiated by rank: King=Opus, Duke=Sonnet, President=Opus/o3, Earl=Opus, Knight=Haiku | No `model:` field in agent definitions; dynamic selection at invocation time | Agent definitions should be model-agnostic. The invoker (human or King-rank orchestrator) determines model based on task complexity, cost/latency trade-offs, and `grimoire.toml` `[models.roles]` advisory defaults. This allows the same agent to run on opus for complex tasks or sonnet for simple ones without modifying the agent definition file. |
+| `model` field in seal-manifest.json per seal | `model_selection` top-level field + no per-seal model | Consistent with dynamic model selection. grimoire.toml provides the defaults. |
+
+### Holy Guardian Angel (HGA)
+
+| Spec | Implementation | Why |
+|------|---------------|-----|
+| Foras (Earl) had `tools: ["Read", "Grep", "Glob", "Bash"]` | `tools: ["Read", "Grep", "Glob"]` (read-only, no Bash) | Safer. The HGA is an alignment monitor — it should observe and report, not execute. Bash access would violate the principle that the monitor should have minimal capability to reduce its own attack surface. If the HGA needs to run security scanners, the separate Auditor agent (Andromalius) handles that. |
+| Named `guardian-angel` in Option B example | Named `foras` (Goetic Earl name) | Consistent naming convention: all agents use Goetic spirit names as their `name` field, with functional filenames. |
+
+### Hook Architecture
+
+| Spec | Implementation | Why |
+|------|---------------|-----|
+| `post-session.sh` under `conjuration/` | `Stop` + `SubagentStop` hooks under `license-to-depart/` | Claude Code fires `Stop` and `SubagentStop` events natively. These are more reliable than a post-session hook because they fire on every termination path (clean exit, Ctrl+C, token limit). A separate post-session.sh was redundant. |
+| `post-tool-use.sh` under `binding/` | Split into `evaluate-output.sh` (under `hga/`) + `block-sensitive.sh` (under `binding/`) | Separation of concerns. Output validation (HGA) and credential blocking (binding enforcement) are distinct responsibilities. Splitting them makes each hook simpler and easier to audit. |
+| `log-to-langfuse.sh` under `hga/` | Deferred | Langfuse integration is not yet configured. The HGA currently operates as a manually-invoked Earl agent (Foras) rather than via automated trace logging. This will be implemented when Langfuse is set up. |
+| `config-change-alert.sh` not in original tree | Added under `binding/` with `ConfigChange` hook | Claude Code provides a `ConfigChange` event for detecting tampering with settings. This was added as an extra safety layer not originally specified. |
+
+### New Components (Not in Original Spec)
+
+| Component | What | Why |
+|-----------|------|-----|
+| `CONTRIBUTING_AGENT.md` (The Way) | Outside-in BDD discipline: spec-before-code, interrogation protocol, 11-phase pipeline | The Grimoire Protocol provides containment and lifecycle. The Way provides the work process — how agents actually build software. They compose: Grimoire = safety container, The Way = development methodology inside it. |
+| `grimoire.toml` | Single source of tunable values (models, budgets, thresholds, paths) | Prevents magic numbers scattered across agent definitions and hooks. One file to tune cost, quality, and behavior without modifying protocol files. |
+| `.claude/skills/` (7 skills) | Phase-specific skills: phase0, interrogate, feature-add, cost-report, error-analysis, heal, update-progress | Skills are the implementation of The Way's phases as invocable commands. They encode the BDD pipeline steps as structured prompts. |
+| `.claude/rules/` (2 rules) | Behavioral rules: no-assumptions.md, context-management.md | Rules enforce discipline across all sessions: never guess (ask or search), keep context window at 40-60%, use pyramid summaries. These apply to all agents regardless of rank. |
+| `grimoire/templates/` (11 templates) | Document templates: PRD, APP_FLOW, TECH_STACK, DATA_MODELS, API_SPEC, FRONTEND_GUIDELINES, IMPLEMENTATION_PLAN, TESTING_PLAN, SECURITY_CHECKLIST, OBSERVABILITY, ROLLOUT_PLAN | Templates from Anvil, adapted to be language-agnostic. The Way's generate-docs phase fills these templates based on interrogation findings. |
+| `.githooks/pre-commit` | Git pre-commit hook | Additional safety layer at the git level: blocks commits containing secrets or sensitive patterns. Defense in depth beyond Claude Code hooks. |
+| Epic Readiness Gate | Phase gate in The Way | Checks whether documentation is complete before implementation begins. Prevents agents from writing code against incomplete or unapproved specs. |
+
+### Deferred from Spec
+
+| Component | Spec Section | Status | Why Deferred |
+|-----------|-------------|--------|--------------|
+| `planetary-router.py` | Section 14 | Deferred | Model routing is handled by `grimoire.toml` defaults + dynamic selection at invocation time. A dedicated routing script is unnecessary until cross-provider routing (LiteLLM/OpenRouter) is configured. |
+| `hga-evaluate.py` | Section 12 | Deferred | HGA evaluation uses the Guardian agent (Foras) directly instead of a standalone Python script. The agent approach is simpler and uses existing Claude Code infrastructure. |
+| `check-memory-integrity.py` | Section 13 | Deferred | Memory integrity checking is a placeholder. Mem0 is configured but integrity verification requires more sophisticated detection than pattern matching. |
+| `log-to-langfuse.sh` | Section 12 | Deferred | Langfuse not yet configured. Will be added when observability infrastructure is set up. |
+| LiteLLM config | Section 14 | Deferred | Single-provider (Anthropic) is sufficient for now. LiteLLM adds complexity and cost; will be added when cross-provider HGA routing is needed. |
+| Langfuse integration | Section 12 | Deferred | See log-to-langfuse.sh above. The HGA operates as a manually-invoked agent for now. |
+| Letta MCP server | Section 13 | Deferred | Mem0 provides sufficient persistent memory. Letta adds complexity; will be evaluated if memory needs exceed Mem0's capabilities. |
+
+### Structural Changes
+
+| Spec | Implementation | Why |
+|------|---------------|-----|
+| `seal-manifest.json` had `model` per seal entry | `model_selection` top-level field, no per-seal model | Consistent with dynamic model selection approach. |
+| `allowed_mcp_servers: ["github", "mem0", "langfuse"]` for King | `allowed_mcp_servers: ["mem0"]` | Only Mem0 is currently configured. GitHub and Langfuse MCP servers are not set up yet. Seal reflects actual capabilities, not aspirational ones. |
+| Spec example Dukes had `allowed_mcp_servers: ["github"]` | `allowed_mcp_servers: []` | GitHub MCP server not configured. |
+| `docs/` directory not in spec tree | Added: `docs/summaries/` and `docs/artifacts/` | Required by context-management.md rules for phase outputs and pyramid summaries. The Way's phases write outputs here. |

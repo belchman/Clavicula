@@ -6,7 +6,6 @@ description: >
   Generates implementation plans and analyzes architectural decisions.
   Named for the Goetic President who teaches philosophy and logic.
 tools: ["Read", "Grep", "Glob"]
-model: opus
 ---
 
 ## Constitutional Constraints

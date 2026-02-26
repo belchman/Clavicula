@@ -6,7 +6,6 @@ description: >
   Follows project conventions and constraint documents. Named for
   the Goetic Duke who teaches mathematical sciences and handicrafts.
 tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
-model: opus
 ---
 
 ## Constitutional Constraints

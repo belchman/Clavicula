@@ -6,7 +6,6 @@ description: >
   codebases, queries external sources. Named for the Goetic Prince who
   discovers hidden things and reveals the past and future.
 tools: ["Read", "Grep", "Glob", "Bash", "WebSearch", "WebFetch"]
-model: opus
 ---
 
 ## Constitutional Constraints

@@ -6,7 +6,6 @@ description: >
   Minimal tool access. Cannot write or execute commands. Named for
   the Goetic Knight who teaches philosophy, rhetoric, and logic.
 tools: ["Read", "Grep", "Glob"]
-model: opus
 ---
 
 ## Constitutional Constraints

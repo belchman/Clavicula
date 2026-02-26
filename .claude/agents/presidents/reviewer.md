@@ -6,7 +6,6 @@ description: >
   Identifies bugs, security issues, and quality problems. Named for
   the Goetic President who discovers hidden things and cures diseases.
 tools: ["Read", "Grep", "Glob"]
-model: opus
 ---
 
 ## Constitutional Constraints

@@ -36,15 +36,6 @@ only to the Divine Names.
 - No hardcoded secrets — use environment variables or secret managers
 - Apply principle of least privilege to all resource access
 
-## Context Discipline
-
-- Keep context window utilization between 40-60%
-- Each pipeline phase starts a fresh session where possible
-- Write outputs to docs/artifacts/ (full) and docs/summaries/ (compact)
-- Only carry summaries forward, not raw outputs
-- Truncate error logs to first 50 lines plus count
-- Discard raw MCP content after extracting key facts
-
 ## Portability
 
 - No grep -oP (PCRE is not portable to macOS/BSD)

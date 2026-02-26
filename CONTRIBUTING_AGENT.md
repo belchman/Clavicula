@@ -175,26 +175,6 @@ When asked to build or change behavior, follow this sequence. It is not optional
 
 Skipping steps is corruption of the process.
 
-## Roles in the Order
-
-**Phase 0** establishes ground truth about the project.
-
-**Interrogation** captures intent. It produces user stories and requirements. Every section must be addressed.
-
-**Documentation** translates interrogation into the behavior contract. Acceptance criteria define what must happen, in Given/When/Then form.
-
-**Specifications** are the executable form of the contract. They must fail before implementation begins (red). They must pass after implementation (green). They describe observable behavior only.
-
-**Holdout scenarios** are adversarial specifications. They test what the contract forgot. They are written in isolation and never shown to the implementing agent.
-
-**Implementation** serves the specifications. It may not invent behavior beyond what is specified. It writes only the code required to turn red to green.
-
-**Verification** proves the implementation satisfies its step. It is mechanical and impartial.
-
-**Security audit** restores trust boundaries that implementation may have violated.
-
-**Ship** records the outcome and publishes it for review.
-
 ## The Rite of Holdout
 
 Every pipeline must generate holdout scenarios before implementation begins.
@@ -243,34 +223,6 @@ The pipeline protects itself from runaway cost and infinite loops.
 
 Circuit breakers are not paranoia. They are discipline.
 
-## Context Discipline
-
-Context is finite. Treat it as a budget.
-
-**Fidelity modes** control how much prior-phase context loads into each new session:
-- `full` | `truncate` | `compact` | `summary:high` | `summary:medium` | `summary:low`
-
-**Compaction rules:**
-- Output > 200 lines: compress to pyramid summary
-- Phase boundary: write artifact + summary, start fresh
-- Error log > 50 lines: first 50 + count
-- Never carry raw MCP content across a phase boundary
-
-Large outputs go to `docs/artifacts/` (Tier 3), not conversation.
-
-## Assumptions Policy
-
-**Interactive mode:** Never guess. ASK.
-
-**Autonomous mode:**
-1. SEARCH first: query all MCP sources and codebase
-2. INFER second: use codebase patterns and conventions
-3. ASSUME last: mark with `[ASSUMPTION: rationale]` and confidence (HIGH/MEDIUM/LOW)
-
-LOW confidence assumptions on critical topics (auth, compliance, data retention) must be flagged as `[NEEDS_HUMAN]` rather than assumed.
-
-"I think" and "probably" are red flags. Replace with "I need to confirm."
-
 ## Auto-Detection
 
 The Grimoire Protocol is language-agnostic. At phase 0, auto-detect:
@@ -295,71 +247,5 @@ The Grimoire Protocol is language-agnostic. At phase 0, auto-detect:
 - Gherkin features when test framework supports them
 - Test cases in project's native test framework otherwise
 - Holdout scenarios for infrastructure/pipeline work
-
-## Portability
-
-Non-negotiable portability rules:
-- No `grep -oP` (PCRE is not portable to macOS/BSD). Use `grep -E` or shell builtins.
-- No hardcoded paths when config variables exist in grimoire.toml.
-- TTY-aware colors: wrap ANSI codes in `if [ -t 1 ]` checks.
-- All config in `grimoire.toml`, not scattered across files.
-
-## Commit Discipline
-
-- Commit after each verified implementation step.
-- Commit messages follow conventional format: `feat(step-id): title`, `fix(security): description`.
-- Never commit secrets, credentials, or `.env` files.
-- The human user is the sole author. Claude is never listed as co-author.
-
-## The Grimoire Protocol
-
-The Way operates within the Grimoire Protocol. The Grimoire provides containment and lifecycle management. The Way provides the work process.
-
-- Agents are conjured per the Conjuration Protocol (CLAUDE.md)
-- Agent permissions are defined in `.claude/agents/` (Seals)
-- Constraints are layered: Divine Names > Angelic Orders > Task Constraints > Agent Seal
-- All actions are logged to `grimoire/logs/audit.log`
-- Seal integrity is verified on session start
-
-The Way governs HOW work is done.
-The Grimoire governs WHO does it and WHAT they are permitted to do.
-
-## Example: Adding a Feature
-
-Even the smallest feature must pass through The Way.
-
-No code precedes specification.
-No specification precedes documentation.
-No documentation precedes interrogation.
-No implementation precedes failure.
-
-User request: "Add a logout button."
-
-1. `/phase0` — Scan project state. Detect language, framework, PM tool.
-2. `/interrogate` — Capture the intent: _As an authenticated user, I want to log out, so that my session is terminated and credentials are cleared._ Where does the button go? What happens on click? What API endpoint? Session cleanup? Token invalidation?
-3. Review the interrogation output. Gate it.
-4. Generate docs: update PRD, APP_FLOW, API_SPEC, IMPLEMENTATION_PLAN. The PRD includes acceptance criteria:
-   ```gherkin
-   Feature: User logout
-     Scenario: Successful logout
-       Given an authenticated user on any page
-       When the user clicks the logout button
-       Then the session token is invalidated
-       And the user is redirected to the login page
-
-     Scenario: Logout with expired session
-       Given a user whose session has already expired
-       When the user clicks the logout button
-       Then the user is redirected to the login page
-       And no error is displayed
-   ```
-5. Review the docs. Gate them.
-6. Write executable specs from the acceptance criteria. Run them. Watch them fail. This is correct.
-7. Generate holdout scenarios: What if the user clicks logout twice rapidly? What if there's no network? What if a background request carries the old token after logout?
-8. Implement step by step. Write only the code that makes the failing specs pass. Verify each step.
-9. Refactor while all specs remain green.
-10. Validate against holdouts.
-11. Security audit: Does logout actually clear tokens? Are there dangling sessions?
-12. Ship.
 
 This is The Way.
